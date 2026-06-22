@@ -2,7 +2,7 @@ const Product = require('../models/Product');
 
 const getAllProducts = async (req, res) => {
   try {
-    const { category, search, featured } = req.query;
+    const { category, search, featured, page, limit } = req.query;
     let query = {};
 
     if (category) {
@@ -18,6 +18,27 @@ const getAllProducts = async (req, res) => {
         { name: { $regex: search, $options: 'i' } },
         { description: { $regex: search, $options: 'i' } }
       ];
+    }
+
+    if (page && limit) {
+      const pageNum = parseInt(page) || 1;
+      const limitNum = parseInt(limit) || 8;
+      const skip = (pageNum - 1) * limitNum;
+
+      const totalProducts = await Product.countDocuments(query);
+      const products = await Product.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limitNum);
+
+      const totalPages = Math.ceil(totalProducts / limitNum);
+
+      return res.json({
+        products,
+        totalPages,
+        currentPage: pageNum,
+        totalProducts
+      });
     }
 
     const products = await Product.find(query).sort({ createdAt: -1 });
