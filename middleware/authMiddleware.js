@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
-const Admin = require('../models/Admin');
 
-const auth = async (req, res, next) => {
+const auth = (req, res, next) => {
   try {
     const authHeader = req.header('Authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -9,14 +8,7 @@ const auth = async (req, res, next) => {
     }
 
     const token = authHeader.replace('Bearer ', '');
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-    const admin = await Admin.findById(decoded.id);
-    if (!admin) {
-      return res.status(401).json({ message: 'Token is not valid' });
-    }
-
-    req.admin = admin;
+    jwt.verify(token, process.env.JWT_SECRET);
     next();
   } catch (error) {
     res.status(401).json({ message: 'Token is not valid' });

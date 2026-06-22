@@ -104,15 +104,15 @@ const updateProduct = async (req, res) => {
       }
     }
 
-    product.name = name || product.name;
-    product.slug = slug || product.slug;
-    product.category = category || product.category;
-    product.price = price || product.price;
-    product.description = description || product.description;
-    product.benefits = benefits || product.benefits;
-    product.images = images || product.images;
-    product.stock = stock !== undefined ? stock : product.stock;
-    product.featured = featured !== undefined ? featured : product.featured;
+    if (name !== undefined) product.name = name;
+    if (slug !== undefined) product.slug = slug;
+    if (category !== undefined) product.category = category;
+    if (price !== undefined) product.price = price;
+    if (description !== undefined) product.description = description;
+    if (benefits !== undefined) product.benefits = benefits;
+    if (images !== undefined) product.images = images;
+    if (stock !== undefined) product.stock = stock;
+    if (featured !== undefined) product.featured = featured;
 
     const updatedProduct = await product.save();
     res.json(updatedProduct);
