@@ -14,3 +14,5 @@ yarn-error.log*
 
 # Database seeding script (user requested)
 seed.js
+
+./uploads
