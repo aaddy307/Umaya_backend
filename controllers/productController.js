@@ -62,12 +62,14 @@ const getProductById = async (req, res) => {
 
 const createProduct = async (req, res) => {
   try {
-    const { name, slug, category, price, description, benefits, images, stock, featured } = req.body;
+    const { name, slug, category, price, description, benefits, images, stock, stockCount, featured } = req.body;
 
     const existingProduct = await Product.findOne({ slug });
     if (existingProduct) {
       return res.status(400).json({ message: 'Product with this slug already exists' });
     }
+
+    const calculatedStock = stockCount !== undefined ? Number(stockCount) > 0 : stock;
 
     const product = new Product({
       name,
@@ -77,7 +79,8 @@ const createProduct = async (req, res) => {
       description,
       benefits,
       images,
-      stock,
+      stock: calculatedStock,
+      stockCount: stockCount !== undefined ? Number(stockCount) : 10, // default to 10 if not provided
       featured
     });
 
@@ -90,7 +93,7 @@ const createProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
   try {
-    const { name, slug, category, price, description, benefits, images, stock, featured } = req.body;
+    const { name, slug, category, price, description, benefits, images, stock, stockCount, featured } = req.body;
 
     const product = await Product.findById(req.params.id);
     if (!product) {
@@ -111,8 +114,17 @@ const updateProduct = async (req, res) => {
     if (description !== undefined) product.description = description;
     if (benefits !== undefined) product.benefits = benefits;
     if (images !== undefined) product.images = images;
-    if (stock !== undefined) product.stock = stock;
     if (featured !== undefined) product.featured = featured;
+
+    if (stockCount !== undefined) {
+      product.stockCount = Number(stockCount);
+      product.stock = Number(stockCount) > 0;
+    } else if (stock !== undefined) {
+      product.stock = stock;
+      if (!stock) {
+        product.stockCount = 0;
+      }
+    }
 
     const updatedProduct = await product.save();
     res.json(updatedProduct);

@@ -14,8 +14,7 @@ const productSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    required: true,
-    enum: ['crystals', 'bracelets', 'ritual-kits', 'energy-tools', 'decor']
+    required: true
   },
   price: {
     type: Number,
@@ -35,6 +34,10 @@ const productSchema = new mongoose.Schema({
   stock: {
     type: Boolean,
     default: true
+  },
+  stockCount: {
+    type: Number,
+    default: 0
   },
   featured: {
     type: Boolean,
